@@ -1,6 +1,7 @@
 flask
-pickleshare
-numpy==1.13.0
+scikit-learn
+numpy
 pandas
 scipy
-scikit-learn
+streamlit
+requests

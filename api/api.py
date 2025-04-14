@@ -1,31 +1,25 @@
+# api/api.py
+# python api/api.py
+    
 import pickle
-import flask
-from flask import request
-from sklearn.linear_model import LogisticRegression
+from flask import Flask, request, jsonify
 
-app = flask.Flask(__name__)
+app = Flask(__name__)
 
-# Load our trained model from a file we created earlier
-with open("iris_model.pkl", 'rb') as file:  
+# Load the trained model
+with open("api/iris_model.pkl", 'rb') as file:
     model = pickle.load(file)
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    # grabbing a set of wine features from the request's body
-    feature_array = request.get_json()['feature_array']
+    data = request.get_json()
+    feature_array = data.get('feature_array')
 
-    # our model rates the wine based on the input array
+    if not feature_array or len(feature_array) != 4:
+        return jsonify({"error": "Invalid input. Expecting 4 features."}), 400
+
     prediction = model.predict([feature_array]).tolist()
-    
-    # preparing a response object and storing the model's predictions
-    response = {}
-    response['prediction'] = prediction
-    
-    # sending our response object back as json
-    return flask.jsonify(response)
+    return jsonify({"prediction": prediction})
 
-
-
-# script initialization
 if __name__ == '__main__':
-    app.run(debug=True, port ='5000',host='0.0.0.0')
+    app.run(debug=True, port=5000, host='0.0.0.0')
