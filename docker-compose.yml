@@ -1,0 +1,21 @@
+services:
+  flask-api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./api:/app/api
+  streamlit:
+    build:
+      context: .
+      dockerfile: Dockerfile.streamlit
+    ports:
+      - "8501:8501"
+    volumes:
+      - .:/app
+    depends_on:
+      - flask-api
+    environment:
+      - FLASK_API_URL=http://flask-api:5000/predict

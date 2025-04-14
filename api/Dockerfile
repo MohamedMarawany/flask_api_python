@@ -1,17 +1,22 @@
-FROM python:3.6-jessie
+FROM python:3.8-slim-buster
 
 LABEL maintainer="https://github.com/AchilleasKn"
 
-RUN pip3 install --upgrade pip
-RUN apt-get update
-RUN apt-get -y install python3-pip
-
-# copy all files of the current directory to the folder /app
-COPY . /app
+# Set working directory
 WORKDIR /app
 
-# install requiremtnts
-RUN pip3 install -r requirements.txt
+# Copy requirements first to leverage caching
+COPY requirements.txt .
 
-# run the flask API
-CMD python3 api.py
+# Upgrade pip and install dependencies
+RUN pip3 install --no-cache-dir --upgrade pip && \
+    pip3 install --no-cache-dir -r requirements.txt
+
+# Copy application files
+COPY api/ api/
+
+# Expose port for Flask API
+EXPOSE 5000
+
+# Run the Flask API
+CMD ["python3", "api/api.py"]
